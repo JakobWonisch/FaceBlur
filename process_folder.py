@@ -13,7 +13,7 @@ def detect_folder(path):
         print(f"[{counter}/{len(files)}] Processing: {f}")
         counter += 1
 
-        setup_opts(path, f)
+        opt = setup_opts(path, f)
 
         try:
             detect(opt)
@@ -30,8 +30,8 @@ def allowed_extension(file):
     return False
 
 def setup_opts(path, file):
-    global opt
     opt = argparse.Namespace(weights=['models/pts/yolov7-tiny.pt'], source=os.path.join(path, file), img_size=640, conf_thres=0.1, iou_thres=0.45, device='cpu', view_img=False, save_txt=False, save_conf=False, nosave=False, classes=None, agnostic_nms=False, augment=False, update=False, project=path, name='output', exist_ok=True, no_trace=False, blurratio=25, hidedetarea=True)
+    return opt
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
