@@ -17,8 +17,8 @@ def detect_folder(path):
 
         try:
             detect(opt)
-        except:
-            print(f"skipping image {f}")
+        except Exception as error:
+            print(f"skipping image {f} with error {error}")
 
 def allowed_extension(file):
     extensions = ['bmp', 'jpg', 'jpeg', 'png', 'tif', 'tiff', 'dng', 'webp', 'mpo']
