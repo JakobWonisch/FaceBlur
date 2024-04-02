@@ -3,9 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Blur Please</title>
+
+    <script>
+        let lastFileName = "default";
+        let loadingContainer;
+
+        window.addEventListener("load", () => {
+            const uploadInput = document.querySelector("#upload");
+            loadingContainer = document.querySelector("#loading-container");
+
+            uploadInput.addEventListener("change", () => {
+                processFile(uploadInput.files[0]);
+            })
+        });
+
+        function processFile(file) {
+            loadingContainer.classList.add("show");
+            lastFileName = file.name;
+
+            var data = new FormData()
+            data.append('file', file)
+
+            fetch('/blur-please', {
+                method: 'POST',
+                body: data
+            })
+            .then(response => {
+                console.log("response", response);
+                return response.blob();
+            })
+            .then(blob => {
+                downloadFile(blob);
+                loadingContainer.classList.remove("show");
+            })
+            .catch(error => {
+                console.error("error occurred: ", error);
+            });
+        }
+
+        function downloadFile(blob) {
+            const newBlob = new Blob([blob]);
+
+            const blobUrl = window.URL.createObjectURL(newBlob);
+
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.setAttribute('download', `${lastFileName}`);
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+
+            // clean up Url
+            window.URL.revokeObjectURL(blobUrl);
+        }
+
+        window.addEventListener("drop", dropHandler);
+        window.addEventListener("dragover", dragOverHandler);
+
+        function dropHandler(ev) {
+            console.log("File(s) dropped");
+
+            // Prevent default behavior (Prevent file from being opened)
+            ev.preventDefault();
+
+            if (ev.dataTransfer.items) {
+                // Use DataTransferItemList interface to access the file(s)
+                [...ev.dataTransfer.items].forEach((item, i) => {
+                // If dropped items aren't files, reject them
+                if (item.kind === "file") {
+                    const file = item.getAsFile();
+                    console.log(`… file[${i}].name = ${file.name}`);
+                    processFile(file);
+                }
+            });
+        } else {
+            // Use DataTransfer interface to access the file(s)
+            [...ev.dataTransfer.files].forEach((file, i) => {
+                console.log(`… file[${i}].name = ${file.name}`);
+                processFile(file);
+                });
+            }
+        }
+
+        function dragOverHandler(ev) {
+            console.log("File(s) in drop zone");
+
+            // Prevent default behavior (Prevent file from being opened)
+            ev.preventDefault();
+        }
+
+    </script>
+    <style>
+        html,
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #4b4b4b;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        #container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #upload-label {
+            flex: 1;
+            background: rgb(255,199,0);
+            background: radial-gradient(circle, rgba(255,199,0,1) 17%, rgba(255,146,47,1) 100%); 
+            background-position-y: 10vh;
+            width: 30%;
+            height: 40%;
+            max-width: 20rem;
+            max-height: 15rem;
+            background-size: 70vw;
+            padding: 3rem;
+            box-sizing: border-box;
+            margin: 2rem;
+            border-radius: 1rem;
+            text-align: center;
+        }
+
+        #loading-container {
+            display: none;
+            background-color: rgba(255,255,255,0.8);
+            z-index: 100;
+            pointer-events: all;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #loading-container.show {
+            display: flex;
+        }
+
+        #loading {
+            background: rgb(255,199,0);
+            width: 2rem;
+            height: 2rem;
+            animation: loadingAnim 0.7s ease infinite alternate-reverse;
+            border-radius: 0.5rem;
+        }
+
+        @keyframes loadingAnim {
+            0% {
+                transform: scale(1);
+            }
+
+            100% {
+                transform: scale(0.2);
+            }
+        }
+    </style>
 </head>
 <body>
-    asdf {{ name }}
+    <div id="container">
+        <label id="upload-label" for="upload">
+            Drag image or click on me to blur, please.
+        </label>
+        <input id="upload" type="file">
+    </div>
+    <div id="loading-container">
+        <div id="loading"></div>
+    </div>
 </body>
 </html>
