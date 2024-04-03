@@ -122,8 +122,11 @@ def detect(opt, save_img=False):
                     
                     #Add Object Blurring Code
                     #..................................................................
+                    crop_width = int(xyxy[2])-int(xyxy[0])
+                    adjusted_blurratio = int(blurratio * crop_width / 200)
                     crop_obj = im0[int(xyxy[1]):int(xyxy[3]),int(xyxy[0]):int(xyxy[2])]
-                    blur = cv2.blur(crop_obj,(blurratio,blurratio))
+                    blur = cv2.blur(crop_obj,(adjusted_blurratio,adjusted_blurratio))
+                    # blur = cv2.blur(crop_obj,(blurratio,blurratio))
                     im0[int(xyxy[1]):int(xyxy[3]),int(xyxy[0]):int(xyxy[2])] = blur
                     #..................................................................
                     
