@@ -1,5 +1,5 @@
 [project]
-name = "blur-please"
+name = "web-interface"
 version = "1.0.0"
 description = "Auto blur web interface"
 dependencies = [
