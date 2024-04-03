@@ -13,7 +13,7 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config.from_file("config.json", load=json.load)
 
-@app.route("/")
+@app.route("/blur-please")
 def hello_world():
     return render_template('index.html')
 
@@ -21,7 +21,7 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route('/blur-please', methods=['POST'])
+@app.route('/blur-please/this', methods=['POST'])
 def blur():
     if 'file' not in request.files:
         return "no file part", 400
